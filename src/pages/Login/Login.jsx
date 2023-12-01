@@ -1,4 +1,7 @@
 import React, { useMemo, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { isAuth } from "redux/modules/authSlice";
 
 function Login() {
   const [loginId, setLoginId] = useState("");
@@ -10,8 +13,36 @@ function Login() {
 
   const [isLogin, setIsLogin] = useState(true);
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleLoginSubmit = (e) => {
     e.preventDefault();
+
+    if (setLoginId && setLoginPassword !== undefined) {
+      // setIsAuth(true)
+      dispatch(isAuth(true));
+      navigate("/");
+    } else {
+      alert("아이디 또는 패스워드를 확인해주세요!");
+    }
+
+    setLoginId("");
+    setLoginPassword("");
+  };
+
+  const handleSignupSubmit = (e) => {
+    e.preventDefault();
+
+    if (setSignupId && setSignupPassword && setSignupNickName !== undefined) {
+      setIsLogin(true);
+    } else {
+      alert("아이디 또는 패스워드를 확인해주세요!");
+    }
+
+    setSignupId("");
+    setSignupPassword("");
+    setSignupNickName("");
   };
 
   const handleGoSignup = () => {
@@ -37,7 +68,7 @@ function Login() {
   return (
     <>
       {isLogin === true ? (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleLoginSubmit}>
           <h2>로그인</h2>
           <label>아이디</label>
           <input
@@ -63,7 +94,7 @@ function Login() {
           <button onClick={handleGoSignup}>회원가입</button>
         </form>
       ) : (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSignupSubmit}>
           <h2>회원가입</h2>
           <label>아이디</label>
           <input
