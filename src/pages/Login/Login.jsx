@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+import axios from "axios";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { isAuth } from "redux/modules/authSlice";
@@ -16,29 +17,62 @@ function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handleLoginSubmit = (e) => {
+  const fetchSingup = async () => {
+    const newUser = {
+      id: signupId,
+      password: signupPassword,
+      nickname: signupNickName
+    };
+
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_URL}/register`, newUser);
+      alert(response.data.message);
+      console.log(response);
+    } catch (error) {
+      alert(error.response.data.message);
+    }
+  };
+
+  useEffect(() => {
+    handleSignupSubmit;
+  }, [signupId, signupPassword, signupNickName]);
+
+  //======================== 로그인 ========================
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
 
-    if (setLoginId && setLoginPassword !== undefined) {
-      // setIsAuth(true)
-      dispatch(isAuth(true));
+    dispatch(isAuth(true));
+
+    const userInfo = {
+      id: loginId,
+      password: loginPassword
+    };
+
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_URL}/login`, userInfo);
+      console.log(response.data);
+      if (response.data.accessToken) {
+        localStorage.setItem("accessToken", response.data.accessToken);
+      }
       navigate("/");
-    } else {
-      alert("아이디 또는 패스워드를 확인해주세요!");
+      // localStorage.getItem("accessToken");
+    } catch (error) {
+      alert(error.response.data.message);
     }
 
     setLoginId("");
     setLoginPassword("");
   };
 
+  //======================== 회원가입 ========================
   const handleSignupSubmit = (e) => {
     e.preventDefault();
 
     if (setSignupId && setSignupPassword && setSignupNickName !== undefined) {
       setIsLogin(true);
-    } else {
-      alert("아이디 또는 패스워드를 확인해주세요!");
     }
+
+    fetchSingup();
 
     setSignupId("");
     setSignupPassword("");
@@ -58,11 +92,7 @@ function Login() {
   }, [loginId, loginPassword]);
 
   const isSignupActive = useMemo(() => {
-    return (
-      signupId.length >= 4 &&
-      signupPassword.length >= 4 &&
-      signupNickName.length >= 1
-    );
+    return signupId.length >= 4 && signupPassword.length >= 4 && signupNickName.length >= 1;
   }, [signupId, signupPassword, signupNickName]);
 
   return (
