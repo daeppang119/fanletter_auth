@@ -1,8 +1,8 @@
 import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { isAuth } from "redux/modules/authSlice";
+import { login } from "redux/modules/authSlice";
 
 function Login() {
   const [loginId, setLoginId] = useState("");
@@ -16,6 +16,10 @@ function Login() {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  // useEffect(() => {
+  //   if (isAuth) navigate("/");
+  // }, [isAuth]);
 
   const fetchSingup = async () => {
     const newUser = {
@@ -33,15 +37,9 @@ function Login() {
     }
   };
 
-  useEffect(() => {
-    handleSignupSubmit;
-  }, [signupId, signupPassword, signupNickName]);
-
   //======================== 로그인 ========================
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-
-    dispatch(isAuth(true));
 
     const userInfo = {
       id: loginId,
@@ -50,12 +48,13 @@ function Login() {
 
     try {
       const response = await axios.post(`${process.env.REACT_APP_URL}/login`, userInfo);
-      console.log(response.data);
+
       if (response.data.accessToken) {
         localStorage.setItem("accessToken", response.data.accessToken);
       }
+      dispatch(login(response.data));
+      // console.log(response.data);
       navigate("/");
-      // localStorage.getItem("accessToken");
     } catch (error) {
       alert(error.response.data.message);
     }
