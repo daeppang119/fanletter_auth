@@ -1,7 +1,14 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 import fakeData from "fakeData.json";
 
 const initialState = fakeData;
+
+export const asyncUpFetch = createAsyncThunk("asyncThunk/asyncUpFetch", async () => {
+  const response = await axios.get("http://localhost:5000/letters");
+
+  console.log(response);
+});
 
 const letterSlice = createSlice({
   name: "letter",
@@ -22,8 +29,8 @@ const letterSlice = createSlice({
         }
         return letter;
       });
-    },
-  },
+    }
+  }
 });
 
 export const { addLetter, deleteLetter, editLetter } = letterSlice.actions;
